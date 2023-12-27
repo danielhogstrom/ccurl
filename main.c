@@ -33,13 +33,10 @@ int main(int argc, char *argv[]){
 	for(r = result; r; r = r->ai_next)
 	{
 	        addr_in	= (struct sockaddr_in*)r->ai_addr;
-		const char *str = inet_ntop(r->ai_family, &addr_in->sin_addr, addr, sizeof(addr));
-		if(str == NULL)
+		if(inet_ntop(r->ai_family, &addr_in->sin_addr, addr, sizeof(addr)))
 		{
-			printf("inet_ntop error");
+			printf("%s\n", addr);
 		}
-	
-		printf("%s\n",addr);
 	}
 
 	freeaddrinfo(result);
