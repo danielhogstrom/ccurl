@@ -10,27 +10,29 @@
 #include <errno.h>
 #include <unistd.h>
 
+
 int main(int argc, char *argv[]){
 	struct  addrinfo hints, *result, *r;		
 	struct sockaddr_in *addr_in;
 	char addr[INET_ADDRSTRLEN];
 	int socket_fd, s;
 	char *request;
-	char header[100], host[100], protocol[100], url[100];
+	char header[100], host[100], protocol[100], path[100];
 	char msgbuf[2048];
+
+	memset(&hints, 0, sizeof(struct addrinfo));
+	memset(addr, '\0', sizeof(addr));
 	
 	if(argc != 3)
 	{
-		printf("usage %s <host> <port>", argv[0]);
+		printf("usage %s <host>/<path> <port>", argv[0]);
 		exit(EXIT_FAILURE);
 	}
 
 	strcpy(protocol, strtok(argv[1], "://"));
 	strcpy(host, strtok(NULL, "/"));
-	strcpy(url, strtok(NULL, "/"));
-	
-	memset(&hints, 0, sizeof(struct addrinfo));
-	memset(addr, '\0', sizeof(addr));
+	strcpy(path, strtok(NULL, "/"));
+
 	hints.ai_family = AF_INET;
 	hints.ai_socktype = SOCK_STREAM;
 	
@@ -53,9 +55,8 @@ int main(int argc, char *argv[]){
 		socket_fd = socket(r->ai_family, r->ai_socktype, r->ai_protocol);
 		if(socket_fd == -1)
 			continue;
-		
+				
 		printf("connecting to %s\n", host);
-
 		s = connect(socket_fd, r->ai_addr, r->ai_addrlen); 
 		if(s != -1)
 		{
@@ -74,7 +75,7 @@ int main(int argc, char *argv[]){
 		exit(EXIT_FAILURE);
 	}
 
-	asprintf(&request, "GET /%s HTTP/1.1\r\nHost: %s\r\nAccept: */*\r\nConnection: close\r\n\r\n", url, host);
+	asprintf(&request, "GET /%s HTTP/1.1\r\nHost: %s\r\nAccept: */*\r\nConnection: close\r\n\r\n", path, host);
 	printf("Sending request %s", request);	
 
 	s = send(socket_fd, request, strlen(request), 0);	
@@ -82,8 +83,8 @@ int main(int argc, char *argv[]){
 	{
 		printf("%s", errno);
 		exit(EXIT_FAILURE);
-	} 
-	
+	}
+
 	s = recv(socket_fd, msgbuf,2047, 0);
 	if(s == -1)
 		printf("%s", errno);
