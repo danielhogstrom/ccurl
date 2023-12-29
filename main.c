@@ -9,26 +9,15 @@
 #include <stdlib.h>
 #include <errno.h>
 #include <unistd.h>
-<<<<<<< HEAD
-=======
-
->>>>>>> fd55225 (connect to host and send get request)
 
 int main(int argc, char *argv[]){
 	struct  addrinfo hints, *result, *r;		
 	struct sockaddr_in *addr_in;
 	char addr[INET_ADDRSTRLEN];
 	int socket_fd, s;
-<<<<<<< HEAD
-	char buf[] = "GET / HTTP/1.1\r\nHost: hemnet.se\r\n\r\n";
-=======
 	char *request;
 	char header[100], host[100], protocol[100], url[100];
 	char msgbuf[2048];
->>>>>>> fd55225 (connect to host and send get request)
-
-	memset(&hints, 0, sizeof(struct addrinfo));
-	memset(addr, '\0', sizeof(addr));
 	
 	if(argc != 3)
 	{
@@ -39,15 +28,13 @@ int main(int argc, char *argv[]){
 	strcpy(protocol, strtok(argv[1], "://"));
 	strcpy(host, strtok(NULL, "/"));
 	strcpy(url, strtok(NULL, "/"));
-
+	
+	memset(&hints, 0, sizeof(struct addrinfo));
+	memset(addr, '\0', sizeof(addr));
 	hints.ai_family = AF_INET;
 	hints.ai_socktype = SOCK_STREAM;
 	
-<<<<<<< HEAD
-	s = getaddrinfo(argv[1], argv[2], &hints, &result);
-=======
 	s = getaddrinfo(host, argv[2], &hints, &result);
->>>>>>> fd55225 (connect to host and send get request)
 	if(s != 0)
 	{
 		printf("Getaddrinfo %s\n", gai_strerror(s));
@@ -66,12 +53,9 @@ int main(int argc, char *argv[]){
 		socket_fd = socket(r->ai_family, r->ai_socktype, r->ai_protocol);
 		if(socket_fd == -1)
 			continue;
-<<<<<<< HEAD
-
-=======
-				
+		
 		printf("connecting to %s\n", host);
->>>>>>> fd55225 (connect to host and send get request)
+
 		s = connect(socket_fd, r->ai_addr, r->ai_addrlen); 
 		if(s != -1)
 		{
@@ -90,37 +74,22 @@ int main(int argc, char *argv[]){
 		exit(EXIT_FAILURE);
 	}
 
-<<<<<<< HEAD
-	s = send(socket_fd, buf, strlen(buf), 0);
-=======
 	asprintf(&request, "GET /%s HTTP/1.1\r\nHost: %s\r\nAccept: */*\r\nConnection: close\r\n\r\n", url, host);
 	printf("Sending request %s", request);	
 
 	s = send(socket_fd, request, strlen(request), 0);	
->>>>>>> fd55225 (connect to host and send get request)
 	if(s == -1)
 	{
 		printf("%s", errno);
 		exit(EXIT_FAILURE);
-<<<<<<< HEAD
 	} 
 	
-	char msgbuf[1024];
-	s = recv(socket_fd, msgbuf, 1023, 0);
-=======
-	}
-
 	s = recv(socket_fd, msgbuf,2047, 0);
->>>>>>> fd55225 (connect to host and send get request)
 	if(s == -1)
 		printf("%s", errno);
 	
 	printf("Received %zd bytes; %s\n", s, msgbuf);
-<<<<<<< HEAD
-
-=======
 	
 	close(socket_fd);
 	free(request);
->>>>>>> fd55225 (connect to host and send get request)
 }
