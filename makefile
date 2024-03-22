@@ -1,5 +1,5 @@
 all:
-      g++ -std=c++17 ccurl.c -o ccurl
+      g++ -std=c++17 main.c -o ccurl
 
 clean:
       $(RM) ccurl
